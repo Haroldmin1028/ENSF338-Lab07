@@ -20,14 +20,58 @@ seen in class [0.2 pts]
 import timeit, matplotlib.pyplot as plt, numpy as np
 
 TASKS = 1000
-class Node: # Represents 
+
+class Node: # Represents a single element of the BST
     def __init__(self, data, parent=None, left=None, right=None):
         self.parent = parent 
         self.data = data 
         self.left = left
         self.right = right
+        
+def insert(data, root=None): # (part 1)
+    current = root
+    parent = None
 
+    while current is not None:
+        parent = current
+        if data <= current.data: 
+            current = current.left
+        else:
+            current = current.right # current becomes none eventually (leaf position is found) (insertion point)
 
+    newnode = Node(data, parent)    
+    if root is None:
+        root = newnode
+    elif data <= parent.data:
+        parent.left = newnode
+    else:
+        parent.right = newnode
+
+    return newnode
+
+def search(data, root): # (part 1)
+    current = root
+    while current is not None:
+        if data == current.data:
+            return current
+        elif data <= current.data:
+            current = current.left
+        else:
+            current = current.right
+    return None
+
+def postorder_with_balance(root):
+    if root is None:
+        return 0 # if height of subtree is 0
+    
+    height_left = postorder(root.left)
+    height_right = postorder(root.right)
+
+    balance = height_left - height_right
+
+    print(f"The difference between the left hight and right height (balance measurement) is {balance}")
+
+    return 1 + max(height_left, height_right) # this returns the height. the 1 accounts for the node itself, and max function finds the largest value. If both are 0, then we return 1
 
 def main():
     search_tasks = []
