@@ -59,5 +59,16 @@ def search(data, root): # (part 1)
             current = current.right
     return None
 
-def height(root):
-    if root is None
+def postorder_with_balance(root):
+    if root is None:
+        return 0 # if height of subtree is 0
+    
+    height_left = postorder(root.left)
+    height_right = postorder(root.right)
+
+    balance = height_left - height_right
+
+    print(f"The difference between the left hight and right height (balance measurement) is {balance}")
+
+    return 1 + max(height_left, height_right) # this returns the height. the 1 accounts for the node itself, and max function finds the largest value. If both are 0, then we return 1
+
