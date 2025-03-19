@@ -64,8 +64,8 @@ def postorder_with_balance(root):
     if root is None:
         return 0 # if height of subtree is 0
     
-    height_left = postorder(root.left)
-    height_right = postorder(root.right)
+    height_left = postorder_with_balance(root.left)
+    height_right = postorder_with_balance(root.right)
 
     balance = height_left - height_right
 
