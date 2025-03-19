@@ -17,7 +17,9 @@ seen in class [0.2 pts]
     time on the Y axis [0.2 pts]
 """
 
-import timeit
+import timeit, matplotlib.pyplot as plt, numpy as np
+
+TASKS = 1000
 
 class Node: # Represents a single element of the BST
     def __init__(self, data, parent=None, left=None, right=None):
@@ -25,8 +27,7 @@ class Node: # Represents a single element of the BST
         self.data = data 
         self.left = left
         self.right = right
-
-
+        
 def insert(data, root=None): # (part 1)
     current = root
     parent = None
@@ -72,3 +73,28 @@ def postorder_with_balance(root):
 
     return 1 + max(height_left, height_right) # this returns the height. the 1 accounts for the node itself, and max function finds the largest value. If both are 0, then we return 1
 
+def main():
+    search_tasks = []
+    unshuffled_task = [x for x in range(TASKS)]
+    avg_performance, abs_balance = [], []
+
+    for i in range(TASKS):
+        task = unshuffled_task[:]
+        np.random.shuffle(task)
+        search_tasks.append(task)
+    for task in search_tasks:
+        # find largest absolute balance value
+        abs_balance.append(balance)
+        total_performance = 0
+        for j in range(TASKS):
+            total_performance += timeit.timeit(lambda: search(j))
+        avg_performance.append(total_performance / TASKS)
+
+    plt.scatter(abs_balance, avg_performance)
+    plt.xlabel("Largest Absolute Balance Value")
+    plt.ylabel("Average Search Time")
+    plt.title("ex1")
+    plt.show()
+
+if __name__ == "__main__":
+    main()
