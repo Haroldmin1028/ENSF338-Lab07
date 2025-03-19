@@ -17,8 +17,9 @@ seen in class [0.2 pts]
     time on the Y axis [0.2 pts]
 """
 
-import timeit
+import timeit, matplotlib.pyplot as plt, numpy as np
 
+TASKS = 1000
 class Node: # Represents 
     def __init__(self, data, parent=None, left=None, right=None):
         self.parent = parent 
@@ -26,3 +27,30 @@ class Node: # Represents
         self.left = left
         self.right = right
 
+
+
+def main():
+    search_tasks = []
+    unshuffled_task = [x for x in range(TASKS)]
+    avg_performance, abs_balance = [], []
+
+    for i in range(TASKS):
+        task = unshuffled_task[:]
+        np.random.shuffle(task)
+        search_tasks.append(task)
+    for task in search_tasks:
+        # find largest absolute balance value
+        abs_balance.append(balance)
+        total_performance = 0
+        for j in range(TASKS):
+            total_performance += timeit.timeit(lambda: search(j))
+        avg_performance.append(total_performance / TASKS)
+
+    plt.scatter(abs_balance, avg_performance)
+    plt.xlabel("Largest Absolute Balance Value")
+    plt.ylabel("Average Search Time")
+    plt.title("ex1")
+    plt.show()
+
+if __name__ == "__main__":
+    main()
