@@ -38,13 +38,21 @@ def search(data, root):
             current = current.right
     return None
 
-# Exercise 3: left rotate for Case 3a
-def _left_rotate():
-    pass
-
 # Exercise 3: right rotate for Case 3a
-def _right_rotate():
-    pass
+def right_rotate(pivot, son):
+    if pivot.parent is not None: # meaning if pivot != root
+        ancestor = pivot.parent
+        ancestor.left = son
+    pivot.left = son.right
+    son.right = pivot
+
+# Exercise 3: left rotate for Case 3a
+def left_rotate(pivot, son):
+    if pivot.parent is not None:
+        ancestor = pivot.parent
+        ancestor.right = son
+    pivot.right = son.left
+    son.left = pivot
 
 def postorder_with_balance(root):
     if root is None:
@@ -74,13 +82,25 @@ def test(newnode):
 
     # Exercise 3: Case 3a now supported, 3b not supported
     elif (newnode.pivot.data < newnode.data and newnode.pivot.balance > 0) or (newnode.pivot.data > newnode.data and newnode.pivot.balance < 0):
-        if (case a):
+        # find son
+        son = newnode
+        while son.parent != newnode.pivot: #may be 'is not' instead of !=
+            son = son.parent
+
+        # Case 3a: node added to outside subtree if:
+        # 1. added to left subtree of son and pivot is negative, then do right rotation
+        if (newnode.data < son.data and newnode.pivot.balance < 0):
             print("Case #3a: Node was added to outside subtree")
-        elif (case b):
+            right_rotate(newnode.pivot, son)
+        # 2. added to right subtree of son and pivot is positive, then do left rotation
+        elif (newnode.data > son.data and newnode.pivot.balance > 0):
+            print("Case #3a: Node was added to outside subtree")
+            left_rotate(newnode.pivot, son)
+
+        elif (newnode.pivot.data > son.data and newnode.pivot.balance < 0) or (newnode.pivot.data < son.data and newnode.pivot.balance > 0):
             print("Case #3b: Not supported.")
         else:
             print("Something went wrong in Case #3.")
-
 
     else:
         print("Something went wrong.")
@@ -95,7 +115,6 @@ def test_1():
     test(newnode)
     postorder_with_balance(root)
 
-
 def test_2():
     print("\nTest 2: Pivot exists, Insertion into shorter subtree")
     root = None
@@ -109,15 +128,27 @@ def test_2():
         postorder_with_balance(root)
 
 #Exercise 3: split to 3a, 3b
-def test_3():
-    print("\nTest 3: Pivot exists, Insertion into taller subtree")
+def test_3a():
+    print("\nTest 3a: Pivot exists, Insertion into taller outside subtree")
     root = None
-    insert_list = [5, 4, 3, 6, 7, 8, 9]
+    insert_list = [10, 5, 2, 1]
     for value in insert_list:
         root = insert(value, root)
         if value == insert_list[-1]:
             newnode = search(insert_list[-1], root)
-            print("Expected:\nCase #3: Not supported.\nActual:")
+            print("Expected:\nCase #3a: Node was added to outside subtree.\nActual:")
+            test(newnode)
+        postorder_with_balance(root)
+
+def test_3b():
+    print("\nTest 3: Pivot exists, Insertion into taller inside subtree")
+    root = None
+    insert_list = [5, 4, 3, 6, 7, 9, 8]
+    for value in insert_list:
+        root = insert(value, root)
+        if value == insert_list[-1]:
+            newnode = search(insert_list[-1], root)
+            print("Expected:\nCase #3b: Not supported.\nActual:")
             test(newnode)
         postorder_with_balance(root)
 
@@ -136,7 +167,8 @@ def test_4():
 def main():
     test_1()
     test_2()
-    test_3()
+    test_3a()
+    test_3b()
     test_4()
   
 if __name__ == "__main__":
