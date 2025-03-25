@@ -84,7 +84,7 @@ def test(newnode):
     elif (newnode.pivot.data < newnode.data and newnode.pivot.balance > 0) or (newnode.pivot.data > newnode.data and newnode.pivot.balance < 0):
         # find son
         son = newnode
-        while son.parent != newnode.pivot: #may be 'is not' instead of !=
+        while son.parent != newnode.pivot:
             son = son.parent
 
         # Case 3a: node added to outside subtree if:
@@ -97,7 +97,7 @@ def test(newnode):
             print("Case #3a: Node was added to outside subtree")
             left_rotate(newnode.pivot, son)
 
-        elif (newnode.pivot.data > son.data and newnode.pivot.balance < 0) or (newnode.pivot.data < son.data and newnode.pivot.balance > 0):
+        elif (newnode.data > son.data and newnode.pivot.balance < 0) or (newnode.data < son.data and newnode.pivot.balance > 0):
             print("Case #3b: Not supported.")
         else:
             print("Something went wrong in Case #3.")
