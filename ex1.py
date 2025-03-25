@@ -78,6 +78,8 @@ def main():
     unshuffled_task = [x for x in range(TASKS)]
     avg_performance, abs_balance = [], []
 
+
+
     for i in range(TASKS):
         task = unshuffled_task[:]
         np.random.shuffle(task)
