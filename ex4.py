@@ -1,3 +1,6 @@
+
+import sys
+sys.setrecursionlimit(20000)
 class Node: # Represents a single element of the BST
     def __init__(self, data, parent=None, left=None, right=None):
         self.parent = parent
@@ -54,43 +57,64 @@ def left_rotate(pivot, son):
     pivot.right = son.left
     son.left = pivot
 
-def rl_rotate(pivot, son, grandson, root):
-    ancestor = pivot.parent
-    # right rotation around grandson
-    pivot.right = grandson
-    if grandson.right is not None:
-        son.left = grandson.right
-    grandson.right = son
-
-    # left rotation around pivot
-    if ancestor is None:
-        root = grandson
-    elif pivot.data > ancestor.data:
-        ancestor.right = grandson
-    elif pivot.data < ancestor.data:
-        ancestor.left = grandson
+def lr_rotate(pivot):
+    son = pivot.left
+    grandson = son.right
+    old_parent = pivot.parent
+    # Perform left rotation on son
+    son.right = grandson.left
     if grandson.left is not None:
-        pivot.right = grandson.left
-    grandson.left = pivot
-
-def lr_rotate(pivot, son, grandson, root):
-    ancestor = pivot.parent
-    # left rotation around grandson
-    pivot.left = grandson
-    if grandson.left is not None:
-        son.right = grandson.left
+        grandson.left.parent = son
     grandson.left = son
+    son.parent = grandson
 
-    # right rotation around pivot
-    if ancestor is None:
-        root = grandson
-    elif pivot.data > ancestor.data:
-        ancestor.left = grandson
-    elif pivot.data < ancestor.data:
-        ancestor.right = grandson
-    if grandson.right is not None:
-        pivot.left = grandson.right
+    # Perform right rotation on pivot
+    pivot.left = grandson.right
+    if grandson.right:
+        grandson.right.parent = pivot
     grandson.right = pivot
+    pivot.parent = grandson
+
+    # Update the parent of pivot (if any)
+    grandson.parent = old_parent
+    if old_parent is None:
+        return grandson  # New root.
+    else:
+        if old_parent.left == pivot:
+            old_parent.left = grandson
+        else:
+            old_parent.right = grandson
+    return grandson
+
+def rl_rotate(pivot):
+    son = pivot.right
+    grandson = son.left
+    old_parent = pivot.parent
+    # Perform right rotation on son
+    son.left = grandson.right
+    if grandson.right is not None:
+        grandson.right.parent = son
+    grandson.right = son
+    son.parent = grandson
+
+    # Perform left rotation on pivot
+    pivot.right = grandson.left
+    if grandson.left:
+        grandson.left.parent = pivot
+    grandson.left = pivot
+    pivot.parent = grandson
+
+    # Update the parent of pivot (if any)
+    grandson.parent = old_parent
+    if old_parent is None:
+        return grandson
+    else:
+        if old_parent.right == pivot:
+            old_parent.right = grandson
+        else:
+            old_parent.left = grandson
+    return grandson
+
 
 def postorder_with_balance(root):
     if root is None:
@@ -143,17 +167,27 @@ def test(newnode, root):
         # 1. added to right subtree of son and pivot is negative, then do LR rotation
         elif (newnode.data > son.data and newnode.pivot.balance < 0):
             print("Case #3b: Node was added to inside subtree.")
-            lr_rotate(newnode.pivot, son, grandson, root)
+            newroot = lr_rotate(newnode.pivot)
+            if newnode.pivot.parent is None:
+                root = newroot
         # 2. added to left subtree of son and pivot is positive, then do RL rotation
         elif (newnode.data < son.data and newnode.pivot.balance > 0):
             print("Case #3b: Node was added to inside subtree.")
-            rl_rotate(newnode.pivot, son, grandson, root)
+            newroot = rl_rotate(newnode.pivot)
+            if newnode.pivot.parent is None:
+                root = newroot
         else:
             print("Something went wrong in Case #3.")
 
     else:
         print("Something went wrong.")
+    return root
 
+def inorder(root):
+    if root is not None:
+        inorder(root.left)
+        print(root.data, end = " ")
+        inorder(root.right)
 
 def test_1():
     print("Test 1: Insertion into empty tree")
@@ -173,11 +207,12 @@ def test_2():
         if value == insert_list[-1]:
             newnode = search(insert_list[-1], root)
             print("Expected:\nCase #2: A pivot exists, and a node was added to the shorter subtree.\nActual:")
-            test(newnode, root)
+            root = test(newnode, root)
         postorder_with_balance(root)
+    inorder(root)
 
 def test_3a():
-    print("\nTest 3a: Pivot exists, Insertion into taller outside subtree")
+    print("\n\nTest 3a: Pivot exists, Insertion into taller outside subtree")
     root = None
     insert_list = [10, 5, 2, 1]
     for value in insert_list:
@@ -185,12 +220,13 @@ def test_3a():
         if value == insert_list[-1]:
             newnode = search(insert_list[-1], root)
             print("Expected:\nCase #3a: Node was added to outside subtree.\nActual:")
-            test(newnode, root)
+            root = test(newnode, root)
         postorder_with_balance(root)
+    inorder(root)
 
 # Exercise 4: Create two test cases, both for 3b
 def test_3ba():
-    print("\nTest 3: Pivot exists, Insertion into taller inside subtree")
+    print("\n\nTest 3: Pivot exists, Insertion into taller inside subtree")
     root = None
     insert_list = [5, 4, 3, 6, 7, 9, 8]
     for value in insert_list:
@@ -198,12 +234,13 @@ def test_3ba():
         if value == insert_list[-1]:
             newnode = search(insert_list[-1], root)
             print("Expected:\nCase #3b: Node was added to inside subtree.\nActual:")
-            test(newnode, root)
+            root = test(newnode, root)
         postorder_with_balance(root)
+    inorder(root)
 
 # Exercise 4: Create two test cases, both for 3b
 def test_3bb():
-    print("\nTest 3: Pivot exists, Insertion into taller inside subtree")
+    print("\n\nTest 3: Pivot exists, Insertion into taller inside subtree")
     root = None
     insert_list = [60, 40, 80, 20, 50, 95, 10, 30, 35]
     for value in insert_list:
@@ -211,11 +248,12 @@ def test_3bb():
         if value == insert_list[-1]:
             newnode = search(insert_list[-1], root)
             print("Expected:\nCase #3b: Node was added to inside subtree.\nActual:")
-            test(newnode, root)
+            root = test(newnode, root)
         postorder_with_balance(root)
+    inorder(root)
 
 def test_4():
-    print("\nTest 4: No pivot, Insertion into balanced tree")
+    print("\n\nTest 4: No pivot, Insertion into balanced tree")
     root = None
     insert_list = [5, 4, 7, 9]
     for value in insert_list:
@@ -223,8 +261,9 @@ def test_4():
         if value == insert_list[-1]:
             newnode = search(insert_list[-1], root)
             print("Expected:\nCase #1: Pivot not detected.\nActual:")
-            test(newnode, root)
+            root = test(newnode, root)
         postorder_with_balance(root)
+    inorder(root)
 
 def main():
     test_1()
